@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Where Will You Travel?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e1a;
+            --card: #111827;
+            --accent: #f5a623;
+            --accent2: #e85d4a;
+            --text: #f0ece4;
+            --muted: #6b7280;
+            --border: #1f2937;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Lato', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background star effect */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 100%),
+                radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.1) 0%, transparent 100%),
+                radial-gradient(1px 1px at 50% 80%, rgba(255,255,255,0.12) 0%, transparent 100%),
+                radial-gradient(1px 1px at 10% 60%, rgba(255,255,255,0.08) 0%, transparent 100%),
+                radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,0.1) 0%, transparent 100%),
+                radial-gradient(600px at 30% 20%, rgba(245,166,35,0.05) 0%, transparent 70%),
+                radial-gradient(600px at 70% 80%, rgba(232,93,74,0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .subtitle {
+            font-family: 'Lato', sans-serif;
+            font-weight: 300;
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.05;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--text) 0%, #c9b99a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            color: var(--muted);
+            font-size: 1rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            letter-spacing: 0.02em;
+        }
+
+        /* Destination card */
+        .destination-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            margin-bottom: 2.5rem;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        .destination-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(245,166,35,0.03) 0%, rgba(232,93,74,0.03) 100%);
+            pointer-events: none;
+        }
+
+        .destination-card.revealed {
+            border-color: rgba(245, 166, 35, 0.3);
+        }
+
+        .destination-card.revealed::before {
+            background: linear-gradient(135deg, rgba(245,166,35,0.06) 0%, rgba(232,93,74,0.06) 100%);
+        }
+
+        .placeholder-text {
+            color: var(--muted);
+            font-size: 1rem;
+            font-style: italic;
+            letter-spacing: 0.05em;
+        }
+
+        .flag {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            display: block;
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .country-name {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: var(--text);
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .country-info {
+            margin-top: 0.75rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        .continent-badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.3rem 1rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border: 1px solid;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        /* Continent colors */
+        .continent-europe { color: #60a5fa; border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.08); }
+        .continent-asia { color: #f87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.08); }
+        .continent-africa { color: #fbbf24; border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.08); }
+        .continent-americas { color: #34d399; border-color: rgba(52,211,153,0.3); background: rgba(52,211,153,0.08); }
+        .continent-oceania { color: #a78bfa; border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.08); }
+
+        @keyframes popIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            0% { transform: translateY(15px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Spin animation for button click */
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(0.8); opacity: 0; }
+            60% { transform: rotate(360deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); opacity: 1; }
+        }
+
+        .flag.spinning {
+            animation: spin 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Button */
+        .btn-wrap {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            font-family: 'Lato', sans-serif;
+            font-weight: 400;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            border-radius: 999px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            padding: 1rem 2.5rem;
+            box-shadow: 0 4px 20px rgba(245,166,35,0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(245,166,35,0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--muted);
+            padding: 1rem 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            color: var(--text);
+            border-color: var(--muted);
+        }
+
+        /* History */
+        .history {
+            margin-top: 2.5rem;
+            text-align: left;
+        }
+
+        .history-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .history-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .counter {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+        }
+
+        .counter span {
+            color: var(--accent);
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="subtitle">Adventure Awaits</p>
+        <h1>Where To Next?</h1>
+        <p class="tagline">Let fate decide your next destination.</p>
+
+        <div class="destination-card" id="card">
+            <p class="placeholder-text" id="placeholder">Your destination will appear here...</p>
+            <span class="flag" id="flag" style="display:none"></span>
+            <div class="country-name" id="countryName" style="display:none"></div>
+            <div class="country-info" id="countryInfo" style="display:none"></div>
+            <span class="continent-badge" id="continentBadge" style="display:none"></span>
+        </div>
+
+        <div class="btn-wrap">
+            <button class="btn-primary" onclick="pickCountry()">✈ Pick My Destination</button>
+            <button class="btn-secondary" id="resetBtn" onclick="reset()" style="display:none">Reset</button>
+        </div>
+
+        <div class="counter" id="counter" style="display:none">
+            You've explored <span id="countNum">0</span> destination(s) this session
+        </div>
+
+        <div class="history" id="historySection" style="display:none">
+            <p class="history-label">Previously Picked</p>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        const countries = [
+            { name: "Japan", flag: "🇯🇵", capital: "Tokyo", continent: "Asia" },
+            { name: "Brazil", flag: "🇧🇷", capital: "Brasília", continent: "Americas" },
+            { name: "France", flag: "🇫🇷", capital: "Paris", continent: "Europe" },
+            { name: "South Africa", flag: "🇿🇦", capital: "Pretoria", continent: "Africa" },
+            { name: "Australia", flag: "🇦🇺", capital: "Canberra", continent: "Oceania" },
+            { name: "India", flag: "🇮🇳", capital: "New Delhi", continent: "Asia" },
+            { name: "Italy", flag: "🇮🇹", capital: "Rome", continent: "Europe" },
+            { name: "Mexico", flag: "🇲🇽", capital: "Mexico City", continent: "Americas" },
+            { name: "Egypt", flag: "🇪🇬", capital: "Cairo", continent: "Africa" },
+            { name: "New Zealand", flag: "🇳🇿", capital: "Wellington", continent: "Oceania" },
+            { name: "Canada", flag: "🇨🇦", capital: "Ottawa", continent: "Americas" },
+            { name: "Germany", flag: "🇩🇪", capital: "Berlin", continent: "Europe" },
+            { name: "Thailand", flag: "🇹🇭", capital: "Bangkok", continent: "Asia" },
+            { name: "Morocco", flag: "🇲🇦", capital: "Rabat", continent: "Africa" },
+            { name: "Peru", flag: "🇵🇪", capital: "Lima", continent: "Americas" },
+            { name: "Iceland", flag: "🇮🇸", capital: "Reykjavik", continent: "Europe" },
+            { name: "Vietnam", flag: "🇻🇳", capital: "Hanoi", continent: "Asia" },
+            { name: "Kenya", flag: "🇰🇪", capital: "Nairobi", continent: "Africa" },
+            { name: "Argentina", flag: "🇦🇷", capital: "Buenos Aires", continent: "Americas" },
+            { name: "Greece", flag: "🇬🇷", capital: "Athens", continent: "Europe" },
+            { name: "Indonesia", flag: "🇮🇩", capital: "Jakarta", continent: "Asia" },
+            { name: "Tanzania", flag: "🇹🇿", capital: "Dodoma", continent: "Africa" },
+            { name: "Colombia", flag: "🇨🇴", capital: "Bogotá", continent: "Americas" },
+            { name: "Portugal", flag: "🇵🇹", capital: "Lisbon", continent: "Europe" },
+            { name: "South Korea", flag: "🇰🇷", capital: "Seoul", continent: "Asia" },
+            { name: "Ethiopia", flag: "🇪🇹", capital: "Addis Ababa", continent: "Africa" },
+            { name: "Chile", flag: "🇨🇱", capital: "Santiago", continent: "Americas" },
+            { name: "Norway", flag: "🇳🇴", capital: "Oslo", continent: "Europe" },
+            { name: "Philippines", flag: "🇵🇭", capital: "Manila", continent: "Asia" },
+            { name: "Fiji", flag: "🇫🇯", capital: "Suva", continent: "Oceania" },
+            { name: "Turkey", flag: "🇹🇷", capital: "Ankara", continent: "Asia" },
+            { name: "Spain", flag: "🇪🇸", capital: "Madrid", continent: "Europe" },
+            { name: "Ghana", flag: "🇬🇭", capital: "Accra", continent: "Africa" },
+            { name: "Cuba", flag: "🇨🇺", capital: "Havana", continent: "Americas" },
+            { name: "Nepal", flag: "🇳🇵", capital: "Kathmandu", continent: "Asia" },
+            { name: "Senegal", flag: "🇸🇳", capital: "Dakar", continent: "Africa" },
+            { name: "Sweden", flag: "🇸🇪", capital: "Stockholm", continent: "Europe" },
+            { name: "Sri Lanka", flag: "🇱🇰", capital: "Colombo", continent: "Asia" },
+            { name: "Papua New Guinea", flag: "🇵🇬", capital: "Port Moresby", continent: "Oceania" },
+            { name: "Costa Rica", flag: "🇨🇷", capital: "San José", continent: "Americas" },
+        ];
+
+        let history = [];
+        let count = 0;
+        let available = [...countries];
+
+        function pickCountry() {
+            if (available.length === 0) available = [...countries];
+
+            const idx = Math.floor(Math.random() * available.length);
+            const chosen = available.splice(idx, 1)[0];
+
+            // Update history
+            if (history.length > 0) {
+                addToHistory(history[history.length - 1]);
+            }
+            history.push(chosen);
+            count++;
+
+            // Show elements
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('card').classList.add('revealed');
+            document.getElementById('resetBtn').style.display = 'inline-block';
+            document.getElementById('counter').style.display = 'block';
+            document.getElementById('countNum').textContent = count;
+
+            // Animate flag
+            const flagEl = document.getElementById('flag');
+            flagEl.style.display = 'block';
+            flagEl.textContent = chosen.flag;
+            flagEl.classList.remove('spinning');
+            void flagEl.offsetWidth; // reflow
+            flagEl.classList.add('spinning');
+
+            // Country name
+            const nameEl = document.getElementById('countryName');
+            nameEl.style.display = 'block';
+            nameEl.textContent = chosen.name;
+            nameEl.style.animation = 'none';
+            void nameEl.offsetWidth;
+            nameEl.style.animation = '';
+
+            // Capital
+            const infoEl = document.getElementById('countryInfo');
+            infoEl.style.display = 'block';
+            infoEl.textContent = `Capital: ${chosen.capital}`;
+
+            // Continent badge
+            const badge = document.getElementById('continentBadge');
+            badge.style.display = 'inline-block';
+            badge.textContent = chosen.continent;
+            badge.className = `continent-badge continent-${chosen.continent.toLowerCase()}`;
+        }
+
+        function addToHistory(country) {
+            const historySection = document.getElementById('historySection');
+            const historyList = document.getElementById('historyList');
+
+            historySection.style.display = 'block';
+            const item = document.createElement('span');
+            item.className = 'history-item';
+            item.textContent = `${country.flag} ${country.name}`;
+            historyList.appendChild(item);
+        }
+
+        function reset() {
+            available = [...countries];
+            history = [];
+            count = 0;
+
+            document.getElementById('placeholder').style.display = 'block';
+            document.getElementById('flag').style.display = 'none';
+            document.getElementById('countryName').style.display = 'none';
+            document.getElementById('countryInfo').style.display = 'none';
+            document.getElementById('continentBadge').style.display = 'none';
+            document.getElementById('card').classList.remove('revealed');
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('counter').style.display = 'none';
+            document.getElementById('historySection').style.display = 'none';
+            document.getElementById('historyList').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
